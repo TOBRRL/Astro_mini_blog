@@ -15,14 +15,17 @@ const {
   description = SITE_DESCRIPTION,
   image = FallbackImage,
 } = Astro.props;
+
+const isHomePage = Astro.url.pathname === "/" || Astro.url.pathname === "/index.html";
 ---
 
 <!doctype html>
 <html lang="en">
   <Head title={title} description={description} image={image} />
   <body>
-    <div class="mx-auto w-full max-w-2xl px-6 pt-5 pb-16">
-      <Header />
+    {!isHomePage && <Header />}
+
+    <div class="mx-auto w-full max-w-6xl px-6 py-16 relative">
       <slot />
     </div>
   </body>

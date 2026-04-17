@@ -1,16 +1,19 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { getCollection } from "astro:content";
+import LeftNav from "../components/LeftNav.astro";
 
-// 仅保留文章获取逻辑，删除了无用的 Item 接口和 projects 数组
 const posts = (await getCollection("blog")).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
 );
 ---
 
 <Layout>
-  <main class="text-left p-0 m-0 max-w-none">
-    
+  <div class="fixed left-16 top-48 hidden lg:block w-32">
+    <LeftNav />
+  </div>
+
+  <main class="text-left p-0 m-0 lg:ml-44 max-w-4xl">
     <h2 class="text-xl font-bold mb-6 mt-2">Writing</h2>
 
     <div class="flex flex-col gap-2">
@@ -26,16 +29,19 @@ const posts = (await getCollection("blog")).sort(
         ))
       }
     </div>
-
   </main>
 </Layout>
 
 <style>
-  /* 由于 Layout.astro 可能自带了居中容器（如 max-w-screen-md），
-     这里强制让 main 标签打破居中逻辑。
-  */
   main {
     margin-left: 0 !important;
     margin-right: auto !important;
+  }
+  
+  @media (min-width: 1024px) {
+    main {
+      margin-left: 11rem !important; 
+      max-width: 56rem !important;
+    }
   }
 </style>

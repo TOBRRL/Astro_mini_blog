@@ -1,0 +1,26 @@
+---
+const { headings } = Astro.props;
+// 仅保留 h2 和 h3 级别的标题
+const filteredHeadings = headings.filter((h: any) => h.depth > 1 && h.depth < 4);
+---
+
+<nav class="flex flex-col gap-4">
+  <div class="space-y-1">
+    <div class="text-[10px] font-bold tracking-[0.2em] uppercase opacity-40">
+      Contents // Index
+    </div>
+    <div class="h-[1px] w-8 bg-black dark:bg-white opacity-20"></div>
+  </div>
+
+  <div class="flex flex-col gap-2">
+    {filteredHeadings.map((h: any) => (
+      <a
+        href={`#${h.slug}`}
+        class={`text-xs transition-colors hover:text-black dark:hover:text-white text-gray-400 leading-relaxed
+          ${h.depth === 3 ? "pl-4 text-[11px] opacity-80" : "font-medium"}`}
+      >
+        {h.text}
+      </a>
+    ))}
+  </div>
+</nav>

@@ -1,6 +1,8 @@
 ---
 import { type CollectionEntry, getCollection, render } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
+import LeftNav from "../../components/LeftNav.astro";
+import TableOfContents from "../../components/TableOfContents.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
@@ -13,7 +15,7 @@ export async function getStaticPaths() {
 type Props = CollectionEntry<"blog">;
 
 const post = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 ---
 
 <Layout
@@ -21,7 +23,39 @@ const { Content } = await render(post);
   description={post.data.description}
   image={post.data.image}
 >
-  <main>
+  <div class="fixed left-16 top-48 hidden lg:block w-32">
+    <LeftNav />
+  </div>
+
+  <div class="fixed right-6 top-48 hidden xl:block w-48">
+    <TableOfContents headings={headings} />
+  </div>
+
+  <main class="lg:ml-44 xl:mr-56 max-w-4xl text-left">
     <Content />
   </main>
 </Layout>
+
+<style>
+  html {
+    scroll-behavior: smooth; /* 点击目录平滑滚动 */
+  }
+
+  main {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+  }
+
+  @media (min-width: 1024px) {
+    main {
+      margin-left: 11rem !important;
+      max-width: 50rem !important; /* 稍微缩小宽度防止挤压右侧 */
+    }
+  }
+
+  @media (min-width: 1280px) {
+    main {
+      margin-right: 14rem !important; /* 给右侧栏留出空间 */
+    }
+  }
+</style>
