@@ -1,0 +1,53 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import LeftNav from '../../components/LeftNav.astro'; // 必须引入
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('blog');
+  const uniqueTags = [...new Set(allPosts.map((post) => post.data.tags || []).flat())];
+
+  return uniqueTags.map((tag) => {
+    const filteredPosts = allPosts.filter((post) => post.data.tags.includes(tag));
+    return {
+      params: { tag },
+      props: { posts: filteredPosts },
+    };
+  });
+}
+
+const { tag } = Astro.params;
+const { posts } = Astro.props;
+---
+
+<Layout title={`Tag: ${tag}`}>
+  <div class="fixed left-16 top-48 hidden lg:block w-32">
+    <LeftNav />
+  </div>
+
+  <main class="lg:ml-44 max-w-4xl text-left">
+    <div class="flex items-center gap-3 mb-12">
+      <span class="text-xs font-bold tracking-[0.3em] uppercase text-blue-400 opacity-80">Tag //</span>
+      <h1 class="text-xl font-mono uppercase text-zinc-900">{tag}</h1>
+    </div>
+
+    <ul class="flex flex-col gap-4 border-l border-zinc-100 pl-6 ml-2">
+      {posts.map((post) => (
+        <li class="group">
+          <a href={`/blog/${post.id}`} class="text-zinc-600 hover:text-blue-500 transition-all">
+            <span class="text-lg font-medium block group-hover:translate-x-1 transition-transform">
+              {post.data.title}
+            </span>
+            <span class="text-[10px] font-mono opacity-50 uppercase">
+              {post.data.pubDate?.toISOString().split('T')[0]}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <a href="/tags" class="inline-block mt-12 text-xs font-mono text-zinc-400 hover:text-blue-500">
+      [ BACK TO INDEX ]
+    </a>
+  </main>
+</Layout>
