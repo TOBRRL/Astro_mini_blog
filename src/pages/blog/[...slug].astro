@@ -24,11 +24,11 @@ const { tags } = post.data;
   description={post.data.description}
   image={post.data.image}
 >
-  <div class="fixed left-16 top-48 hidden lg:block w-32">
+  <div class="fixed left-16 top-32 hidden lg:block w-32">
     <LeftNav />
   </div>
 
-  <div class="fixed right-6 top-48 hidden xl:block w-48">
+  <div class="fixed right-6 top-32 hidden xl:block w-48">
     <TableOfContents headings={headings} />
   </div>
 
@@ -109,27 +109,37 @@ const { tags } = post.data;
 </script>
 
 <style>
-  html {
-    scroll-behavior: smooth;
+  /* 针对左侧导航和右侧目录的通用增强 */
+  :global(.fixed) {
+    color: #18181b !important; /* 更深的 zinc-900，提升对比度 */
+    font-size: 1.1rem !important; /* 比正文大一号 */
+    font-weight: 600 !important;  /* 增加字重，不至于太单薄 */
   }
 
-  main {
-    margin-left: 0 !important;
-    margin-right: auto !important;
+  /* 左侧导航链接 */
+  :global(.fixed a) {
+    transition: all 0.2s ease;
+    display: block;
+    padding: 0.25rem 0;
   }
 
-  @media (min-width: 1024px) {
-    main {
-      margin-left: 11rem !important;
-      max-width: 50rem !important; 
-    }
+  :global(.fixed a:hover) {
+    color: #3b82f6 !important; /* 悬停亮蓝 */
+    transform: translateX(4px); /* 稍微右移，有交互感 */
   }
 
-  @media (min-width: 1280px) {
-    main {
-      margin-right: 14rem !important;
-    }
+  /* 右侧目录特定样式 */
+  :global(.fixed nav ul li) {
+    margin-bottom: 0.75rem !important;
   }
+
+  /* 如果目录层级太挤，增加间距 */
+  :global(.fixed nav ul) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
 </style>
 
 <style is:global>
