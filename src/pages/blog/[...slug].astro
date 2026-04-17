@@ -57,9 +57,60 @@ const { tags } = post.data;
   </main>
 </Layout>
 
+<script>
+  const setupFoldableHeadings = () => {
+    const article = document.querySelector('article');
+    if (!article) return;
+
+    // 选取所有标题层级
+    const headings = article.querySelectorAll('h1, h2, h3, h4, h5, h6');
+
+    headings.forEach(heading => {
+      if (heading.textContent?.includes('+')) {
+        if (heading.parentElement?.tagName === 'DETAILS') return;
+
+        const details = document.createElement('details');
+        details.open = true; 
+        
+        // --- 修复关键：转移 ID ---
+        // 将原标题的 ID 转移到 details 容器上，确保锚点链接有效
+        if (heading.id) {
+          details.id = heading.id;
+          heading.removeAttribute('id'); // 移除原 ID 避免重复
+        }
+
+        const summary = document.createElement('summary');
+        summary.classList.add(heading.tagName.toLowerCase());
+        summary.innerHTML = heading.innerHTML.replace('+', '');
+        details.appendChild(summary);
+
+        const currentLevel = parseInt(heading.tagName.substring(1));
+        let next = heading.nextElementSibling;
+
+        while (next) {
+          const nextTagName = next.tagName;
+          if (/^H[1-6]$/.test(nextTagName)) {
+            const nextLevel = parseInt(nextTagName.substring(1));
+            if (nextLevel <= currentLevel) break;
+          }
+          const nodeToMove = next;
+          next = next.nextElementSibling;
+          details.appendChild(nodeToMove);
+        }
+
+        heading.parentNode?.insertBefore(details, heading);
+        heading.remove();
+      }
+    });
+  };
+
+  document.addEventListener('astro:page-load', setupFoldableHeadings);
+  setupFoldableHeadings();
+</script>
+
 <style>
   html {
-    scroll-behavior: smooth; /* 点击目录平滑滚动 */
+    scroll-behavior: smooth;
   }
 
   main {
@@ -79,4 +130,137 @@ const { tags } = post.data;
       margin-right: 14rem !important;
     }
   }
+</style>
+
+<style is:global>
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* --- 统一标题基础 DNA --- */
+  article :is(h1, h2, h3, h4, h5, h6), 
+  summary {
+    color: #000 !important;
+    font-weight: 800 !important;
+    line-height: 1.3 !important;
+    letter-spacing: -0.025em !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 0.5rem !important;
+    border: none !important;
+    padding-bottom: 0 !important;
+    margin-top: 2.5rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* --- 关键修复：定义各个层级的字号，无论是原生还是变成 summary --- */
+  article h1, summary.h1 { font-size: 2.25rem !important; margin-top: 0 !important; }
+  article h2, summary.h2 { font-size: 1.75rem !important; }
+  article h3, summary.h3 { font-size: 1.4rem !important; }
+  article h4, summary.h4 { font-size: 1.2rem !important; }
+  article h5, summary.h5, article h6, summary.h6 { font-size: 1rem !important; color: #52525b !important; }
+
+  article p { 
+    font-size: 1.05rem !important;
+    line-height: 1.8 !important;
+    color: #27272a !important;
+    margin-bottom: 1.5rem !important; 
+  }
+
+  details {
+    border: none !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  summary {
+    cursor: pointer !important;
+    list-style: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+    outline: none !important;
+    transition: color 0.2s ease;
+    width: fit-content !important;
+  }
+
+  summary::after {
+    content: "▼";
+    font-size: 0.6em; /* 使用 em 确保三角随字号自动缩放 */
+    color: #000 !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s ease;
+    margin-top: 0.2em;
+    display: inline-block;
+  }
+
+  summary::before {
+    content: none !important;
+  }
+
+  details:not([open]) summary::after {
+    transform: rotate(90deg);
+    color: #d1d5db !important;
+  }
+
+  details[open] summary::after {
+    transform: rotate(0deg);
+    color: #000 !important;
+  }
+
+  summary:hover {
+    color: #3b82f6 !important;
+  }
+
+  details > *:not(summary) {
+    padding-left: 1rem !important;
+    margin-top: 1rem !important;
+  }
+
+  summary::-webkit-details-marker { display: none !important; }
+</style>
+
+<style is:global>
+  /* --- 终极方案：强制恢复块引用 --- */
+  /* 使用 article[class] 增加选择器权重，压制 Tailwind prose */
+  article blockquote, 
+  .prose blockquote {
+    border-left: 4px solid #3b82f6 !important; /* 蓝色边框，显眼一点 */
+    background-color: #f8fafc !important;      /* 浅淡蓝灰色背景 */
+    padding: 1rem 1.5rem !important;
+    margin: 2rem 0 !important;
+    border-radius: 0 4px 4px 0 !important;
+    font-style: italic !important;
+    color: #475569 !important;                 /* 深灰色文字 */
+    display: block !important;
+    quotes: none !important;                   /* 去掉默认引号 */
+  }
+
+  /* 消除引用内部默认产生的引号（Tailwind prose 经常带这个） */
+  article blockquote p::before,
+  article blockquote p::after {
+    content: "" !important;
+  }
+
+  /* 确保引用里的段落没有多余边距 */
+  article blockquote p {
+    margin: 0 !important;
+    line-height: 1.6 !important;
+  }
+</style>
+
+<style is:global>
+  /* ... 其他样式 ... */
+
+  /* 找到并替换这段 */
+  article li {
+    display: list-item !important;
+    list-style-position: inside !important; /* 核心：解决错行 */
+    margin-bottom: 0.5rem !important;
+  }
+
+  /* 确保 li 里的文字不换行 */
+  article li > p {
+    display: inline !important; 
+  }
+
+  /* ... 其他样式 ... */
 </style>
