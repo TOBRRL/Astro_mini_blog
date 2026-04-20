@@ -32,26 +32,33 @@ const { tags } = post.data;
     <TableOfContents headings={headings} />
   </div>
 
-  <main class="lg:ml-44 xl:mr-56 max-w-4xl text-left">
-    <h1 class="text-3xl font-bold mb-4 text-black uppercase">{post.data.title}</h1>
+  <main class="lg:ml-44 xl:mr-56 max-w-4xl text-left pt-0 !mt-16">
+    <div class="flex items-baseline justify-between gap-4 mb-4">
+      <h1 class="text-3xl font-bold text-black uppercase leading-tight m-0">
+        {post.data.title}
+      </h1>
+      <span class="text-[12px] font-mono opacity-50 uppercase shrink-0">
+        {post.data.date?.toISOString().split('T')[0]}
+      </span>
+    </div>
 
     {tags && tags.length > 0 && (
-      <div class="flex flex-wrap gap-2 mb-8 items-center border-b border-zinc-800 pb-6">
-        <span class="text-[10px] text-blue-1000 font-bold tracking-[0.2em] uppercase opacity-70">
+      <div class="flex flex-wrap gap-4 mb-8 items-center border-b border-zinc-100 pb-6">
+        <span class="text-[10px] text-zinc-400 font-bold tracking-[0.2em] uppercase">
           Filed under:
         </span>
         {tags.map((tag: string) => (
           <a 
             href={`/tags/${tag}`} 
-            class="text-[11px] font-mono text-zinc-400 hover:text-white border border-zinc-800 hover:border-blue-500/50 px-2 py-0.5 transition-all bg-zinc-900/30 rounded-sm"
+            class="text-[11px] font-mono font-bold text-zinc-500 hover:text-black transition-colors uppercase tracking-widest"
           >
-            #{tag}
+            # {tag}
           </a>
         ))}
       </div>
     )}
 
-    <article class="prose prose-invert max-w-none">
+    <article class="prose prose-zinc max-w-none">
       <Content />
     </article>
   </main>
@@ -62,9 +69,7 @@ const { tags } = post.data;
     const article = document.querySelector('article');
     if (!article) return;
 
-    // 选取所有标题层级
     const headings = article.querySelectorAll('h1, h2, h3, h4, h5, h6');
-
     headings.forEach(heading => {
       if (heading.textContent?.includes('+')) {
         if (heading.parentElement?.tagName === 'DETAILS') return;
@@ -72,11 +77,9 @@ const { tags } = post.data;
         const details = document.createElement('details');
         details.open = true; 
         
-        // --- 修复关键：转移 ID ---
-        // 将原标题的 ID 转移到 details 容器上，确保锚点链接有效
         if (heading.id) {
           details.id = heading.id;
-          heading.removeAttribute('id'); // 移除原 ID 避免重复
+          heading.removeAttribute('id');
         }
 
         const summary = document.createElement('summary');
@@ -108,46 +111,17 @@ const { tags } = post.data;
   setupFoldableHeadings();
 </script>
 
-<style>
-  /* 针对左侧导航和右侧目录的通用增强 */
-  :global(.fixed) {
-    color: #18181b !important; /* 更深的 zinc-900，提升对比度 */
-    font-size: 1.1rem !important; /* 比正文大一号 */
-    font-weight: 600 !important;  /* 增加字重，不至于太单薄 */
-  }
-
-  /* 左侧导航链接 */
-  :global(.fixed a) {
-    transition: all 0.2s ease;
-    display: block;
-    padding: 0.25rem 0;
-  }
-
-  :global(.fixed a:hover) {
-    color: #3b82f6 !important; /* 悬停亮蓝 */
-    transform: translateX(4px); /* 稍微右移，有交互感 */
-  }
-
-  /* 右侧目录特定样式 */
-  :global(.fixed nav ul li) {
-    margin-bottom: 0.75rem !important;
-  }
-
-  /* 如果目录层级太挤，增加间距 */
-  :global(.fixed nav ul) {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
-</style>
-
 <style is:global>
+  /* 统一左侧导航字重 */
+  .fixed.left-16 a {
+    font-weight: 800 !important;
+    text-transform: uppercase;
+  }
+
   html {
     scroll-behavior: smooth;
   }
 
-  /* --- 统一标题基础 DNA --- */
   article :is(h1, h2, h3, h4, h5, h6), 
   summary {
     color: #000 !important;
@@ -156,121 +130,41 @@ const { tags } = post.data;
     letter-spacing: -0.025em !important;
     display: flex !important;
     align-items: center !important;
-    justify-content: flex-start !important;
-    gap: 0.5rem !important;
-    border: none !important;
-    padding-bottom: 0 !important;
     margin-top: 2.5rem !important;
     margin-bottom: 1rem !important;
   }
 
-  /* --- 关键修复：定义各个层级的字号，无论是原生还是变成 summary --- */
-  article h1, summary.h1 { font-size: 2.25rem !important; margin-top: 0 !important; }
-  article h2, summary.h2 { font-size: 1.75rem !important; }
-  article h3, summary.h3 { font-size: 1.4rem !important; }
-  article h4, summary.h4 { font-size: 1.2rem !important; }
-  article h5, summary.h5, article h6, summary.h6 { font-size: 1rem !important; color: #52525b !important; }
-
-  article p { 
-    font-size: 1.05rem !important;
-    line-height: 1.8 !important;
-    color: #27272a !important;
-    margin-bottom: 1.5rem !important; 
+  article blockquote {
+    border-left: 4px solid #3b82f6 !important;
+    background-color: #f8fafc !important; 
+    padding: 1rem 1.5rem !important;
+    margin: 2rem 0 !important;
+    font-style: italic !important;
+    color: #475569 !important;
   }
 
-  details {
-    border: none !important;
+  article li {
+    display: list-item !important;
+    list-style-position: inside !important;
     margin-bottom: 0.5rem !important;
   }
 
   summary {
     cursor: pointer !important;
     list-style: none !important;
-    padding: 0 !important;
-    background: transparent !important;
     outline: none !important;
-    transition: color 0.2s ease;
-    width: fit-content !important;
   }
 
   summary::after {
     content: "▼";
-    font-size: 0.6em; /* 使用 em 确保三角随字号自动缩放 */
-    color: #000 !important;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s ease;
-    margin-top: 0.2em;
-    display: inline-block;
-  }
-
-  summary::before {
-    content: none !important;
+    font-size: 0.6em;
+    margin-left: 0.5rem;
+    transition: transform 0.3s ease;
   }
 
   details:not([open]) summary::after {
-    transform: rotate(90deg);
-    color: #d1d5db !important;
-  }
-
-  details[open] summary::after {
-    transform: rotate(0deg);
-    color: #000 !important;
-  }
-
-  summary:hover {
-    color: #3b82f6 !important;
-  }
-
-  details > *:not(summary) {
-    padding-left: 1rem !important;
-    margin-top: 1rem !important;
+    transform: rotate(-90deg);
   }
 
   summary::-webkit-details-marker { display: none !important; }
-</style>
-
-<style is:global>
-  /* --- 终极方案：强制恢复块引用 --- */
-  /* 使用 article[class] 增加选择器权重，压制 Tailwind prose */
-  article blockquote, 
-  .prose blockquote {
-    border-left: 4px solid #3b82f6 !important; /* 蓝色边框，显眼一点 */
-    background-color: #f8fafc !important;      /* 浅淡蓝灰色背景 */
-    padding: 1rem 1.5rem !important;
-    margin: 2rem 0 !important;
-    border-radius: 0 4px 4px 0 !important;
-    font-style: italic !important;
-    color: #475569 !important;                 /* 深灰色文字 */
-    display: block !important;
-    quotes: none !important;                   /* 去掉默认引号 */
-  }
-
-  /* 消除引用内部默认产生的引号（Tailwind prose 经常带这个） */
-  article blockquote p::before,
-  article blockquote p::after {
-    content: "" !important;
-  }
-
-  /* 确保引用里的段落没有多余边距 */
-  article blockquote p {
-    margin: 0 !important;
-    line-height: 1.6 !important;
-  }
-</style>
-
-<style is:global>
-  /* ... 其他样式 ... */
-
-  /* 找到并替换这段 */
-  article li {
-    display: list-item !important;
-    list-style-position: inside !important; /* 核心：解决错行 */
-    margin-bottom: 0.5rem !important;
-  }
-
-  /* 确保 li 里的文字不换行 */
-  article li > p {
-    display: inline !important; 
-  }
-
-  /* ... 其他样式 ... */
 </style>

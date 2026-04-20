@@ -18,9 +18,11 @@ const navItems = [
     {navItems.map(item => (
       <a 
         href={item.href} 
-        class="text-[1.1rem] font-mono font-bold text-zinc-800 hover:text-blue-600 transition-all duration-300 hover:pl-3 border-l-2 border-transparent hover:border-blue-600 pl-0"
+        
+        class="text-[1.1rem] font-mono font-bold text-black hover:text-blue-600 transition-all duration-300 hover:pl-3 border-l-2 border-transparent hover:border-blue-600 pl-0"
       >
-        [{item.name}]
+        {/* 这里删掉了 [{item.name}] 中的中括号 */}
+        {item.name}
       </a>
     ))}
   </div>

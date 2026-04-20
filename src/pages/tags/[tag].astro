@@ -21,7 +21,7 @@ const { posts } = Astro.props;
 ---
 
 <Layout title={`Tag: ${tag}`}>
-  <div class="fixed left-16 top-48 hidden lg:block w-32">
+  <div class="fixed left-16 top-32 hidden lg:block w-32">
     <LeftNav />
   </div>
 
@@ -31,20 +31,24 @@ const { posts } = Astro.props;
       <h1 class="text-xl font-mono uppercase text-zinc-900">{tag}</h1>
     </div>
 
-    <ul class="flex flex-col gap-4 border-l border-zinc-100 pl-6 ml-2">
-      {posts.map((post) => (
-        <li class="group">
-          <a href={`/blog/${post.id}`} class="text-zinc-600 hover:text-blue-500 transition-all">
-            <span class="text-lg font-medium block group-hover:translate-x-1 transition-transform">
-              {post.data.title}
-            </span>
-            <span class="text-[10px] font-mono opacity-50 uppercase">
-              {post.data.pubDate?.toISOString().split('T')[0]}
-            </span>
-          </a>
-        </li>
-      ))}
-    </ul>
+    <ul class="flex flex-col gap-8 p-0 m-0">
+  {posts.map((post) => (
+    /* 核心：list-none 去掉点，但它依然是 block 容器 */
+    <li class="group list-none">
+      <a href={`/blog/${post.id}`} class="block no-underline">
+        <div class="flex items-baseline justify-between gap-4">
+          <span class="text-2xl font-black text-black group-hover:text-blue-600 transition-all group-hover:translate-x-2">
+            {post.data.title}
+          </span>
+          
+          <span class="text-[12px] font-mono opacity-50 uppercase shrink-0">
+            {post.data.date?.toISOString().split('T')[0]}
+          </span>
+        </div>
+      </a>
+    </li>
+  ))}
+</ul>
 
     <a href="/tags" class="inline-block mt-12 text-xs font-mono text-zinc-400 hover:text-blue-500">
       [ BACK TO INDEX ]

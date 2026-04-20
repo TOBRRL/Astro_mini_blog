@@ -1,25 +1,40 @@
 ---
 const { headings } = Astro.props;
+// 过滤出 2 级和 3 级标题
 const filteredHeadings = headings.filter((h: any) => h.depth > 1 && h.depth < 4);
 ---
 
-<nav class="flex flex-col gap-6">
-  <div class="space-y-2">
-    <div class="text-[14px] font-black tracking-[0.2em] uppercase text-zinc-900">
-      Contents // Index
-    </div>
-    <div class="h-[2px] w-10 bg-zinc-900"></div>
+<nav class="flex flex-col gap-6 text-left">
+  <div class="text-[14px] font-black tracking-[0.2em] uppercase text-zinc-900 text-left">
+    Contents // Index
   </div>
 
-  <div class="flex flex-col gap-3">
+  <div class="flex flex-col gap-3 items-start w-full">
     {filteredHeadings.map((h: any) => (
       <a
         href={`#${h.slug}`}
-        class={`text-[1.05rem] transition-all hover:text-blue-600 text-zinc-700 leading-snug
-          ${h.depth === 3 ? "pl-6 text-[0.95rem] border-l border-zinc-200" : "font-bold"}`}
+        /* - items-start 和 text-left 确保左对齐
+           - no-underline 去掉文本下划线
+           - font-black 强制加粗
+        */
+        class={`text-left no-underline transition-all hover:text-blue-600 text-zinc-900 leading-tight font-black
+          ${h.depth === 3 
+            ? "pl-4 ml-1 text-[0.9rem] border-l-2 border-zinc-200 opacity-70" 
+            : "text-[1.05rem]"}`}
       >
-        {h.text}
+        {/* 3. 去掉加号 */}
+        {h.text.replace(/^\+/, '')}
       </a>
     ))}
   </div>
 </nav>
+
+<style>
+  /* 确保链接没有任何装饰线 */
+  a {
+    text-decoration: none !important;
+    border-bottom: none !important;
+    display: block;
+    width: 100%;
+  }
+</style>
